@@ -26,7 +26,21 @@ USE_TZ = True
 
 MEDIA_ROOT = os.path.join(SITE_ROOT, 'static')
 
-SECRET_KEY = '5c^pml#7e3d$zor%*_7y098(l0i=d3$+y_((11-_j0&amp;f9rw9%)'
+def ensure_secret_key_file():
+    """Checks that secret.py exists in settings dir. If not, creates one
+    with a random generated SECRET_KEY setting."""
+    secret_path = os.path.join(SITE_ROOT, 'secret.py')
+    if not os.path.exists(secret_path):
+        from django.utils.crypto import get_random_string
+        secret_key = get_random_string(50,
+            'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')
+        with open(secret_path, 'w') as f:
+            f.write("SECRET_KEY = " + repr(secret_key) + "\n")
+
+# Import the secret key
+ensure_secret_key_file()
+
+from secret import SECRET_KEY  # noqa
 
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
